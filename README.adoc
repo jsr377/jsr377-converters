@@ -20,3 +20,16 @@ To get started, link:https://www.clahub.com/agreements/jsr377/jsr377-api[sign th
 
  * link:http://jsr377.github.io/site/[JSR377 website, window="_blank"]
  * link:http://jsr377-api.40747.n7.nabble.com[Forum / Mailing List, window="_blank"]
+
+== Building
+
+This project uses link:http://gradle.org[Gradle] as build tool. The build is set as a composite build until final binary releases of JSR377 are posted.
+Follow these instructions to build this project
+
+[source]
+----
+$ git clone https://github.com/jsr377/jsr377-api.git jsr377/jsr377-api
+$ git clone https://github.com/jsr377/jsr377-converters.git jsr377/jsr377-converters
+$ cd jsr377/jsr377-converters
+$ ./gradlew build
+----

@@ -48,7 +48,6 @@ idea {
 
 repositories {
     jcenter()
-    mavenLocal()
 }
 
 dependencies {

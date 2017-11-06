@@ -15,3 +15,5 @@
  */
 
 rootProject.name = 'jsr377-converters'
+
+includeBuild '../jsr377-api'
