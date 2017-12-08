@@ -29,11 +29,22 @@ import static java.util.Objects.requireNonNull;
 /**
  * @author Andres Almiray
  */
-public class CompositeConverter<T> extends AbstractConverter<T> {
+public class CompositeConverter<T> extends AbstractConverter<T> implements FormattingConverter<T> {
     private final Class<T> targetClass;
     private final Object lock = new Object[0];
     private final WeakReference<Class<? extends Converter<T>>>[] converterClasses;
     private WeakReference<Converter<T>>[] converters;
+    private String format;
+
+    @Override
+    public String getFormat() {
+        return format;
+    }
+
+    @Override
+    public void setFormat(String format) {
+        this.format = format;
+    }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public CompositeConverter(Class<T> targetClass, Class<? extends Converter<T>>[] converterClasses) {
@@ -56,8 +67,12 @@ public class CompositeConverter<T> extends AbstractConverter<T> {
         }
     }
 
+    public int getSize() {
+        return converterClasses.length;
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public CompositeConverter<T> copyOf() {
+    public CompositeConverter<T> copyOfByAdding() {
         List<Class<? extends Converter<T>>> classes = new ArrayList<>();
 
         for (WeakReference<Class<? extends Converter<T>>> reference : converterClasses) {
@@ -70,7 +85,7 @@ public class CompositeConverter<T> extends AbstractConverter<T> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public CompositeConverter<T> copyOf(Class<? extends Converter<T>> converterClass) {
+    public CompositeConverter<T> copyOfByAdding(Class<? extends Converter<T>> converterClass) {
         requireNonNull(converterClass, "Argument 'converterClass' must not be null");
 
         List<Class<? extends Converter<T>>> classes = new ArrayList<>();
@@ -84,6 +99,34 @@ public class CompositeConverter<T> extends AbstractConverter<T> {
         }
 
         return new CompositeConverter<>(targetClass, classes.toArray(new Class[classes.size()]));
+    }
+
+    CompositeConverter<T> copyOfByRemoving(Class<? extends Converter<T>> converterClass) {
+        requireNonNull(converterClass, "Argument 'converterClass' must not be null");
+
+        List<Class<? extends Converter<T>>> classes = new ArrayList<>();
+        for (WeakReference<Class<? extends Converter<T>>> reference : converterClasses) {
+            if (reference.get() != null) {
+                classes.add(reference.get());
+            }
+        }
+        if (classes.contains(converterClass)) {
+            classes.remove(converterClass);
+        }
+
+        return classes.isEmpty() ? null : new CompositeConverter<>(targetClass, classes.toArray(new Class[classes.size()]));
+    }
+
+    Class<? extends Converter<T>>[] getConverterClasses() {
+        List<Class<? extends Converter<T>>> classes = new ArrayList<>();
+
+        for (WeakReference<Class<? extends Converter<T>>> reference : converterClasses) {
+            if (reference.get() != null) {
+                classes.add(reference.get());
+            }
+        }
+
+        return classes.toArray(new Class[classes.size()]);
     }
 
     @Override
@@ -126,6 +169,9 @@ public class CompositeConverter<T> extends AbstractConverter<T> {
             try {
                 Converter<T> converter = reference.get();
                 if (converter != null) {
+                    if (converter instanceof FormattingConverter) {
+                        ((FormattingConverter) converter).setFormat(format);
+                    }
                     return converter.fromObject(value);
                 }
             } catch (ConversionException e) {
@@ -144,6 +190,9 @@ public class CompositeConverter<T> extends AbstractConverter<T> {
             try {
                 Converter<T> converter = reference.get();
                 if (converter != null) {
+                    if (converter instanceof FormattingConverter) {
+                        ((FormattingConverter) converter).setFormat(format);
+                    }
                     return converter.toString(value);
                 }
             } catch (ConversionException e) {
