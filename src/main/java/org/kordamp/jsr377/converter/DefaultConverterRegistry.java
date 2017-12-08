@@ -37,18 +37,19 @@ public final class DefaultConverterRegistry implements ConverterRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultConverterRegistry.class);
     private static final String ERROR_TARGET_TYPE_NULL = "Argument 'targetType' must not be null";
     private static final String ERROR_CONVERTER_CLASS_NULL = "Argument 'converterClass' must not be null";
-    private final Object LOCK = new Object[0];
-    // @GuardedBy("LOCK")
+    private final Object lock = new Object[0];
+    // @GuardedBy("lock")
     private final WeakCache<String, Class<? extends Converter<?>>> converterCache = new WeakCache<>();
-    // @GuardedBy("LOCK")
-    private final Map<String, CompositeConverter> compositeConverterCache = new ConcurrentHashMap<>();
+    // @GuardedBy("lock")
+    private final Map<String, CompositeConverter<?>> compositeConverterCache = new ConcurrentHashMap<>();
 
     public DefaultConverterRegistry() {
         loadConverters();
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void loadConverters() {
-        synchronized (LOCK) {
+        synchronized (lock) {
             for (ConverterProvider provider : ServiceLoader.load(ConverterProvider.class)) {
                 registerConverter(provider.getTargetType(), provider.getConverterType());
             }
@@ -64,10 +65,11 @@ public final class DefaultConverterRegistry implements ConverterRegistry {
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> void registerConverter(Class<T> targetType, Class<? extends Converter<T>> converterClass) {
         requireNonNull(targetType, ERROR_TARGET_TYPE_NULL);
         requireNonNull(converterClass, ERROR_CONVERTER_CLASS_NULL);
-        synchronized (LOCK) {
+        synchronized (lock) {
             String targetTypeName = targetType.getName();
 
             // is targetType handled by a converter?
@@ -107,10 +109,11 @@ public final class DefaultConverterRegistry implements ConverterRegistry {
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> void unregisterConverter(Class<T> targetType, Class<? extends Converter<T>> converterClass) {
         requireNonNull(targetType, ERROR_TARGET_TYPE_NULL);
 
-        synchronized (LOCK) {
+        synchronized (lock) {
             String targetTypeName = targetType.getName();
             if (converterClass == null) {
                 compositeConverterCache.remove(targetTypeName);
@@ -123,7 +126,7 @@ public final class DefaultConverterRegistry implements ConverterRegistry {
                 return;
             }
 
-            CompositeConverter<T> converter = compositeConverterCache.get(targetTypeName);
+            CompositeConverter<T> converter = (CompositeConverter<T>) compositeConverterCache.get(targetTypeName);
             if (converter != null) {
                 converter = converter.copyOfByRemoving(converterClass);
                 if (converter == null) {
@@ -139,6 +142,7 @@ public final class DefaultConverterRegistry implements ConverterRegistry {
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> Converter<T> findConverter(Class<T> targetType) {
         requireNonNull(targetType, ERROR_TARGET_TYPE_NULL);
         LOG.trace("Searching PropertyEditor for {}", targetType.getName());
@@ -159,17 +163,18 @@ public final class DefaultConverterRegistry implements ConverterRegistry {
 
     @Override
     public void clear() {
-        synchronized (LOCK) {
+        synchronized (lock) {
             converterCache.clear();
             compositeConverterCache.clear();
         }
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private <T> Converter<T> doFindConverter(Class<T> targetType) {
-        synchronized (LOCK) {
+        synchronized (lock) {
             String targetTypeName = targetType.getName();
             if (compositeConverterCache.containsKey(targetTypeName)) {
-                CompositeConverter<T> converter = compositeConverterCache.get(targetTypeName);
+                CompositeConverter<T> converter = (CompositeConverter<T>) compositeConverterCache.get(targetTypeName);
                 return converter.copyOfByAdding();
             } else {
                 Class<? extends Converter<?>> converterType = converterCache.get(targetTypeName);

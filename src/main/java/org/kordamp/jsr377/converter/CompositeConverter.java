@@ -101,6 +101,7 @@ public class CompositeConverter<T> extends AbstractConverter<T> implements Forma
         return new CompositeConverter<>(targetClass, classes.toArray(new Class[classes.size()]));
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     CompositeConverter<T> copyOfByRemoving(Class<? extends Converter<T>> converterClass) {
         requireNonNull(converterClass, "Argument 'converterClass' must not be null");
 
@@ -117,6 +118,7 @@ public class CompositeConverter<T> extends AbstractConverter<T> implements Forma
         return classes.isEmpty() ? null : new CompositeConverter<>(targetClass, classes.toArray(new Class[classes.size()]));
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     Class<? extends Converter<T>>[] getConverterClasses() {
         List<Class<? extends Converter<T>>> classes = new ArrayList<>();
 
