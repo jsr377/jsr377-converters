@@ -35,7 +35,6 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'org.kordamp.gradle.stats'
-apply from: 'gradle/publishing.gradle'
 apply from: 'gradle/code-quality.gradle'
 apply from: 'gradle/code-coverage.gradle'
 
@@ -100,3 +99,5 @@ javadoc {
     options.footer      = rootProject.javadocFooter
     options.links       = ['http://docs.oracle.com/javase/8/docs/api/']
 }
+
+apply from: 'gradle/publishing.gradle'
