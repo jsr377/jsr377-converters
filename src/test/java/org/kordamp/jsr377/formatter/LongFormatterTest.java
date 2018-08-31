@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package org.kordamp.jsr377.formatter;
+
+import org.junit.jupiter.params.provider.Arguments;
+
+import java.util.stream.Stream;
 
 import static org.kordamp.jsr377.formatter.AbstractNumberFormatter.PATTERN_CURRENCY;
 import static org.kordamp.jsr377.formatter.AbstractNumberFormatter.PATTERN_PERCENT;
@@ -32,33 +36,33 @@ public class LongFormatterTest extends AbstractNumberFormatterTestCase<Long> {
         return new LongFormatter(pattern);
     }
 
-    protected Object[] where_simple() {
-        return new Object[]{
-            new Object[]{100L, "100"}
-        };
+    public static Stream<Arguments> where_simple() {
+        return Stream.of(
+            Arguments.of(100L, "100")
+        );
     }
 
-    protected Object[] where_pattern() {
-        return new Object[]{
-            new Object[]{PATTERN_PERCENT, null, null},
-            new Object[]{PATTERN_CURRENCY, 100L, "$100.00"},
-            new Object[]{PATTERN_PERCENT, 1L, "100%"},
-            new Object[]{null, 100L, "100"},
-            new Object[]{"", 100L, "100"},
-            new Object[]{"##.0", 20L, "20.0"}
-        };
+    public static Stream<Arguments> where_pattern() {
+        return Stream.of(
+            Arguments.of(PATTERN_PERCENT, null, null),
+            Arguments.of(PATTERN_CURRENCY, 100L, "$100.00"),
+            Arguments.of(PATTERN_PERCENT, 1L, "100%"),
+            Arguments.of(null, 100L, "100"),
+            Arguments.of("", 100L, "100"),
+            Arguments.of("##.0", 20L, "20.0")
+        );
     }
 
-    protected Object[] where_parse_error() {
-        return new Object[]{
-            new Object[]{PATTERN_CURRENCY, "abc"},
-            new Object[]{PATTERN_PERCENT, "abc"}
-        };
+    public static Stream<Arguments> where_parse_error() {
+        return Stream.of(
+            Arguments.of(PATTERN_CURRENCY, "abc"),
+            Arguments.of(PATTERN_PERCENT, "abc")
+        );
     }
 
-    protected Object[] where_invalid_pattern() {
-        return new Object[]{
-            new Object[]{";garbage*@%&"},
-        };
+    public static Stream<Arguments> where_invalid_pattern() {
+        return Stream.of(
+            Arguments.of(";garbage*@%&")
+        );
     }
 }

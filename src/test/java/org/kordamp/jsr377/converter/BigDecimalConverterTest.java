@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  */
 package org.kordamp.jsr377.converter;
 
+import org.junit.jupiter.params.provider.Arguments;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.kordamp.jsr377.formatter.AbstractNumberFormatter.PATTERN_CURRENCY;
 import static org.kordamp.jsr377.formatter.AbstractNumberFormatter.PATTERN_PERCENT;
@@ -38,26 +41,26 @@ public class BigDecimalConverterTest extends AbstractNumberConverterTestCase<Big
         return converter;
     }
 
-    protected Object[] where_value_format_result() {
-        return new Object[]{
-            new Object[]{null, null, null},
-            new Object[]{"", null, null},
-            new Object[]{"1", null, BigDecimal.ONE},
-            new Object[]{"100%", PATTERN_PERCENT, BigDecimal.ONE},
-            new Object[]{"$1.00", PATTERN_CURRENCY, BigDecimal.ONE},
-            new Object[]{BigDecimal.ONE, null, BigDecimal.ONE},
-            new Object[]{1L, null, BigDecimal.ONE}
-        };
+    public static Stream<Arguments> where_value_format_result() {
+        return Stream.of(
+            Arguments.of(null, null, null),
+            Arguments.of("", null, null),
+            Arguments.of("1", null, BigDecimal.ONE),
+            Arguments.of("100%", PATTERN_PERCENT, BigDecimal.ONE),
+            Arguments.of("$1.00", PATTERN_CURRENCY, BigDecimal.ONE),
+            Arguments.of(BigDecimal.ONE, null, BigDecimal.ONE),
+            Arguments.of(1L, null, BigDecimal.ONE)
+        );
     }
 
-    protected Object[] where_invalid_value() {
-        return new Object[]{
-            new Object[]{"garbage"},
-            new Object[]{"1, 2, 3"},
-            new Object[]{Collections.emptyList()},
-            new Object[]{Collections.emptyMap()},
-            new Object[]{Arrays.asList(1, 2, 3)},
-            new Object[]{new Object()},
-        };
+    public static Stream<Arguments> where_invalid_value() {
+        return Stream.of(
+            Arguments.of("garbage"),
+            Arguments.of("1, 2, 3"),
+            Arguments.of(Collections.emptyList()),
+            Arguments.of(Collections.emptyMap()),
+            Arguments.of(Arrays.asList(1, 2, 3)),
+            Arguments.of(new Object())
+        );
     }
 }

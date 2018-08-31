@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
  */
 package org.kordamp.jsr377;
 
-import junitparams.JUnitParamsRunner;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -30,16 +28,15 @@ import java.util.TimeZone;
 /**
  * @author Andres Almiray
  */
-@RunWith(JUnitParamsRunner.class)
 public abstract class ConversionSupport {
     private Locale defaultLocale = Locale.getDefault();
 
-    @Before
+    @BeforeEach
     public void setup() {
         Locale.setDefault(Locale.US);
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         Locale.setDefault(defaultLocale);
     }

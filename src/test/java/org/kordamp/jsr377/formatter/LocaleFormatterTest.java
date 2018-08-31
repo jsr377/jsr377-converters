@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,16 @@
  */
 package org.kordamp.jsr377.formatter;
 
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.kordamp.jsr377.ConversionSupport;
 
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Andres Almiray
@@ -30,8 +32,8 @@ import static org.junit.Assert.assertThat;
 public class LocaleFormatterTest extends ConversionSupport {
     private static final Locale DE_CH_BASEL = new Locale("de", "CH", "Basel");
 
-    @Test
-    @Parameters(method = "where_bidirectional")
+    @ParameterizedTest
+    @MethodSource("where_bidirectional")
     public void bidirectionalConversion(Locale locale, String literal) {
         // given:
         LocaleFormatter formatter = new LocaleFormatter();
@@ -45,8 +47,8 @@ public class LocaleFormatterTest extends ConversionSupport {
         assertThat(lcl, equalTo(locale));
     }
 
-    @Test
-    @Parameters(method = "where_parse")
+    @ParameterizedTest
+    @MethodSource("where_parse")
     public void checkParse(Locale locale, String literal) {
         // given:
         LocaleFormatter formatter = new LocaleFormatter();
@@ -58,25 +60,25 @@ public class LocaleFormatterTest extends ConversionSupport {
         assertThat(lcl, equalTo(locale));
     }
 
-    protected Object[] where_bidirectional() {
-        return new Object[]{
-            new Object[]{null, null},
-            new Object[]{Locale.ENGLISH, "en"},
-            new Object[]{Locale.US, "en_US"},
-            new Object[]{Locale.UK, "en_GB"},
-            new Object[]{DE_CH_BASEL, "de_CH_Basel"}
-        };
+    public static Stream<Arguments> where_bidirectional() {
+        return Stream.of(
+            Arguments.of(null, null),
+            Arguments.of(Locale.ENGLISH, "en"),
+            Arguments.of(Locale.US, "en_US"),
+            Arguments.of(Locale.UK, "en_GB"),
+            Arguments.of(DE_CH_BASEL, "de_CH_Basel")
+        );
     }
 
-    protected Object[] where_parse() {
-        return new Object[]{
-            new Object[]{null, null},
-            new Object[]{null, ""},
-            new Object[]{null, " "},
-            new Object[]{Locale.ENGLISH, "en"},
-            new Object[]{Locale.US, "en_US"},
-            new Object[]{DE_CH_BASEL, "de_CH_Basel"},
-            new Object[]{null, "de_CH_Basel_X"},
-        };
+    public static Stream<Arguments> where_parse() {
+        return Stream.of(
+            Arguments.of(null, null),
+            Arguments.of(null, ""),
+            Arguments.of(null, " "),
+            Arguments.of(Locale.ENGLISH, "en"),
+            Arguments.of(Locale.US, "en_US"),
+            Arguments.of(DE_CH_BASEL, "de_CH_Basel"),
+            Arguments.of(null, "de_CH_Basel_X")
+        );
     }
 }

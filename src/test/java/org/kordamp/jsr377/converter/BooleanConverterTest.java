@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,26 @@
  */
 package org.kordamp.jsr377.converter;
 
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.kordamp.jsr377.ConversionSupport;
 
 import javax.application.converter.ConversionException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andres Almiray
  */
 public class BooleanConverterTest extends ConversionSupport {
-    @Test
-    @Parameters(method = "where_value_format_result")
+    @ParameterizedTest
+    @MethodSource("where_value_format_result")
     public void nullsafe_valueWithFormatProducesResult(Object value, String format, Boolean result) {
         // given:
         BooleanConverter converter = new BooleanConverter();
@@ -45,39 +48,39 @@ public class BooleanConverterTest extends ConversionSupport {
         assertThat(output, equalTo(result));
     }
 
-    @Test(expected = ConversionException.class)
-    @Parameters(method = "where_invalid_value")
+    @ParameterizedTest
+    @MethodSource("where_invalid_value")
     public void invalidValueProducesError(Object value) {
         // given:
         BooleanConverter converter = new BooleanConverter();
 
         // when:
-        converter.fromObject(value);
+        assertThrows(ConversionException.class, () -> converter.fromObject(value));
     }
 
-    protected Object[] where_value_format_result() {
-        return new Object[]{
-            new Object[]{null, null, null},
-            new Object[]{"", null, null},
-            new Object[]{"true", null, true},
-            new Object[]{"false", null, false},
-            new Object[]{true, null, true},
-            new Object[]{false, null, false},
-            new Object[]{"true", "boolean", true},
-            new Object[]{"false", "boolean", false},
-            new Object[]{"yes", "query", true},
-            new Object[]{"no", "query", false},
-            new Object[]{"on", "switch", true},
-            new Object[]{"off", "switch", false}
-        };
+    public static Stream<Arguments> where_value_format_result() {
+        return Stream.of(
+            Arguments.of(null, null, null),
+            Arguments.of("", null, null),
+            Arguments.of("true", null, true),
+            Arguments.of("false", null, false),
+            Arguments.of(true, null, true),
+            Arguments.of(false, null, false),
+            Arguments.of("true", "boolean", true),
+            Arguments.of("false", "boolean", false),
+            Arguments.of("yes", "query", true),
+            Arguments.of("no", "query", false),
+            Arguments.of("on", "switch", true),
+            Arguments.of("off", "switch", false)
+        );
     }
 
-    protected Object[] where_invalid_value() {
-        return new Object[]{
-            new Object[]{Collections.emptyList()},
-            new Object[]{Collections.emptyMap()},
-            new Object[]{Arrays.asList(1, 2, 3)},
-            new Object[]{new Object()},
-        };
+    public static Stream<Arguments> where_invalid_value() {
+        return Stream.of(
+            Arguments.of(Collections.emptyList()),
+            Arguments.of(Collections.emptyMap()),
+            Arguments.of(Arrays.asList(1, 2, 3)),
+            Arguments.of(new Object())
+        );
     }
 }

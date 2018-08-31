@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,19 @@
  */
 package org.kordamp.jsr377.converter;
 
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.kordamp.jsr377.ConversionSupport;
 
 import javax.application.converter.ConversionException;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andres Almiray
@@ -32,8 +35,8 @@ import static org.junit.Assert.assertThat;
 public class LocaleConverterTest extends ConversionSupport {
     private static final Locale DE_CH_BASEL = new Locale("de", "CH", "Basel");
 
-    @Test
-    @Parameters(method = "where_bidirectional")
+    @ParameterizedTest
+    @MethodSource("where_bidirectional")
     public void bidirectionalConversion(Object value, Locale locale, String literal) {
         // given:
         LocaleConverter formatter = new LocaleConverter();
@@ -47,32 +50,32 @@ public class LocaleConverterTest extends ConversionSupport {
         assertThat(lcl, equalTo(locale));
     }
 
-    @Test(expected = ConversionException.class)
-    @Parameters(method = "where_invalid")
+    @ParameterizedTest
+    @MethodSource("where_invalid")
     public void checkInvalidConversion(Object value) {
         // given:
-        LocaleConverter formatter = new LocaleConverter();
+        LocaleConverter converter = new LocaleConverter();
 
         // when:
-        formatter.fromObject(value);
+        assertThrows(ConversionException.class, () -> converter.fromObject(value));
     }
 
-    protected Object[] where_bidirectional() {
-        return new Object[]{
-            new Object[]{null, null, null},
-            new Object[]{"", null, null},
-            new Object[]{" ", null, null},
-            new Object[]{Locale.ENGLISH, Locale.ENGLISH, "en"},
-            new Object[]{"en", Locale.ENGLISH, "en"},
-        };
+    public static Stream<Arguments> where_bidirectional() {
+        return Stream.of(
+            Arguments.of(null, null, null),
+            Arguments.of("", null, null),
+            Arguments.of(" ", null, null),
+            Arguments.of(Locale.ENGLISH, Locale.ENGLISH, "en"),
+            Arguments.of("en", Locale.ENGLISH, "en")
+        );
     }
 
-    protected Object[] where_invalid() {
-        return new Object[]{
-            new Object[]{1},
-            new Object[]{new Object()},
-            new Object[]{Collections.emptyList()},
-            new Object[]{Collections.emptyMap()},
-        };
+    public static Stream<Arguments> where_invalid() {
+        return Stream.of(
+            Arguments.of(1),
+            Arguments.of(new Object()),
+            Arguments.of(Collections.emptyList()),
+            Arguments.of(Collections.emptyMap())
+        );
     }
 }

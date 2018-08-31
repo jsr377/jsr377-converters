@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.kordamp.jsr377.converter;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.application.converter.ConversionException;
 import javax.application.converter.Converter;
@@ -35,19 +35,19 @@ import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Andres Almiray
  */
-@RunWith(JUnitParamsRunner.class)
 public class DefaultConverterRegistryTest {
-    @Test
-    @Parameters(method = "where_types")
+    @ParameterizedTest
+    @MethodSource("where_types")
     @SuppressWarnings("rawtypes")
     public <T> void checkDefaultSetup(Class<T> targetType, Class<? extends Converter<T>> converterType) {
         // given:
@@ -122,37 +122,37 @@ public class DefaultConverterRegistryTest {
         assertThat(converter, nullValue());
     }
 
-    protected Object[] where_types() {
-        return new Object[]{
-            new Object[]{BigDecimal.class, BigDecimalConverter.class},
-            new Object[]{BigInteger.class, BigIntegerConverter.class},
-            new Object[]{Boolean.class, BooleanConverter.class},
-            new Object[]{Byte.class, ByteConverter.class},
-            new Object[]{Calendar.class, CalendarConverter.class},
-            new Object[]{Date.class, DateConverter.class},
-            new Object[]{Double.class, DoubleConverter.class},
-            new Object[]{File.class, FileConverter.class},
-            new Object[]{Float.class, FloatConverter.class},
-            new Object[]{Integer.class, IntegerConverter.class},
-            new Object[]{LocalDate.class, LocalDateConverter.class},
-            new Object[]{LocalDateTime.class, LocalDateTimeConverter.class},
-            new Object[]{LocalTime.class, LocalTimeConverter.class},
-            new Object[]{Locale.class, LocaleConverter.class},
-            new Object[]{Long.class, LongConverter.class},
-            new Object[]{Path.class, PathConverter.class},
-            new Object[]{Short.class, ShortConverter.class},
-            new Object[]{String.class, StringConverter.class},
-            new Object[]{URI.class, URIConverter.class},
-            new Object[]{URL.class, URLConverter.class},
-            new Object[]{Boolean.TYPE, BooleanConverter.class},
-            new Object[]{Byte.TYPE, ByteConverter.class},
-            new Object[]{Double.TYPE, DoubleConverter.class},
-            new Object[]{Float.TYPE, FloatConverter.class},
-            new Object[]{Integer.TYPE, IntegerConverter.class},
-            new Object[]{Long.TYPE, LongConverter.class},
-            new Object[]{Short.TYPE, ShortConverter.class},
-            new Object[]{MyEnum.class, EnumConverter.class}
-        };
+    public static Stream<Arguments> where_types() {
+        return Stream.of(
+            Arguments.of(BigDecimal.class, BigDecimalConverter.class),
+            Arguments.of(BigInteger.class, BigIntegerConverter.class),
+            Arguments.of(Boolean.class, BooleanConverter.class),
+            Arguments.of(Byte.class, ByteConverter.class),
+            Arguments.of(Calendar.class, CalendarConverter.class),
+            Arguments.of(Date.class, DateConverter.class),
+            Arguments.of(Double.class, DoubleConverter.class),
+            Arguments.of(File.class, FileConverter.class),
+            Arguments.of(Float.class, FloatConverter.class),
+            Arguments.of(Integer.class, IntegerConverter.class),
+            Arguments.of(LocalDate.class, LocalDateConverter.class),
+            Arguments.of(LocalDateTime.class, LocalDateTimeConverter.class),
+            Arguments.of(LocalTime.class, LocalTimeConverter.class),
+            Arguments.of(Locale.class, LocaleConverter.class),
+            Arguments.of(Long.class, LongConverter.class),
+            Arguments.of(Path.class, PathConverter.class),
+            Arguments.of(Short.class, ShortConverter.class),
+            Arguments.of(String.class, StringConverter.class),
+            Arguments.of(URI.class, URIConverter.class),
+            Arguments.of(URL.class, URLConverter.class),
+            Arguments.of(Boolean.TYPE, BooleanConverter.class),
+            Arguments.of(Byte.TYPE, ByteConverter.class),
+            Arguments.of(Double.TYPE, DoubleConverter.class),
+            Arguments.of(Float.TYPE, FloatConverter.class),
+            Arguments.of(Integer.TYPE, IntegerConverter.class),
+            Arguments.of(Long.TYPE, LongConverter.class),
+            Arguments.of(Short.TYPE, ShortConverter.class),
+            Arguments.of(MyEnum.class, EnumConverter.class)
+        );
     }
 
     public enum MyEnum {

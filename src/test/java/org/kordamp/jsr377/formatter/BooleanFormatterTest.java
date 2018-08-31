@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,17 @@
  */
 package org.kordamp.jsr377.formatter;
 
-import junitparams.Parameters;
-import org.junit.Test;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.kordamp.jsr377.ConversionSupport;
 
+import java.util.stream.Stream;
+
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.kordamp.jsr377.formatter.BooleanFormatter.PATTERN_BOOL;
 import static org.kordamp.jsr377.formatter.BooleanFormatter.PATTERN_QUERY;
 import static org.kordamp.jsr377.formatter.BooleanFormatter.PATTERN_SWITCH;
@@ -29,8 +34,8 @@ import static org.kordamp.jsr377.formatter.BooleanFormatter.PATTERN_SWITCH;
  * @author Andres Almiray
  */
 public class BooleanFormatterTest extends ConversionSupport {
-    @Test
-    @Parameters(method = "where_value_literal")
+    @ParameterizedTest
+    @MethodSource("where_value_literal")
     public void valueProducesLiteral(Boolean value, String literal) {
         // given:
         BooleanFormatter formatter = new BooleanFormatter();
@@ -44,35 +49,35 @@ public class BooleanFormatterTest extends ConversionSupport {
         assertThat(result, equalTo(value));
     }
 
-    protected Object[] where_value_literal() {
-        return new Object[]{
-            new Object[]{false, "false"},
-            new Object[]{true, "true"}
-        };
+    public static Stream<Arguments> where_value_literal() {
+        return Stream.of(
+            Arguments.of(false, "false"),
+            Arguments.of(true, "true")
+        );
     }
 
-    @Test
-    @Parameters(method = "where_parse_value_literal")
+    @ParameterizedTest
+    @MethodSource("where_parse_value_literal")
     public void parseValueProducesLiteral(Boolean value, String literal) {
         // expect:
         assertThat(BooleanFormatter.parseBoolean(literal), equalTo(value));
     }
 
-    protected Object[] where_parse_value_literal() {
-        return new Object[]{
-            new Object[]{null, null},
-            new Object[]{null, ""},
-            new Object[]{false, "false"},
-            new Object[]{true, "true"},
-            new Object[]{false, "no"},
-            new Object[]{true, "yes"},
-            new Object[]{false, "off"},
-            new Object[]{true, "on"}
-        };
+    public static Stream<Arguments> where_parse_value_literal() {
+        return Stream.of(
+            Arguments.of(null, null),
+            Arguments.of(null, ""),
+            Arguments.of(false, "false"),
+            Arguments.of(true, "true"),
+            Arguments.of(false, "no"),
+            Arguments.of(true, "yes"),
+            Arguments.of(false, "off"),
+            Arguments.of(true, "on")
+        );
     }
 
-    @Test
-    @Parameters(method = "where_pattern_value_literal")
+    @ParameterizedTest
+    @MethodSource("where_pattern_value_literal")
     public void valueWithPatternProducesLiteral(String pattern, Boolean value, String literal) {
         // given:
         BooleanFormatter formatter = BooleanFormatter.getInstance(pattern);
@@ -89,64 +94,64 @@ public class BooleanFormatterTest extends ConversionSupport {
         }
     }
 
-    protected Object[] where_pattern_value_literal() {
-        return new Object[]{
-            new Object[]{null, null, null},
-            new Object[]{null, false, "false"},
-            new Object[]{null, true, "true"},
-            new Object[]{PATTERN_BOOL, null, null},
-            new Object[]{PATTERN_BOOL, false, "false"},
-            new Object[]{PATTERN_BOOL, true, "true"},
-            new Object[]{PATTERN_QUERY, null, null},
-            new Object[]{PATTERN_QUERY, false, "no"},
-            new Object[]{PATTERN_QUERY, true, "yes"},
-            new Object[]{PATTERN_SWITCH, null, null},
-            new Object[]{PATTERN_SWITCH, false, "off"},
-            new Object[]{PATTERN_SWITCH, true, "on"}
-        };
+    public static Stream<Arguments> where_pattern_value_literal() {
+        return Stream.of(
+            Arguments.of(null, null, null),
+            Arguments.of(null, false, "false"),
+            Arguments.of(null, true, "true"),
+            Arguments.of(PATTERN_BOOL, null, null),
+            Arguments.of(PATTERN_BOOL, false, "false"),
+            Arguments.of(PATTERN_BOOL, true, "true"),
+            Arguments.of(PATTERN_QUERY, null, null),
+            Arguments.of(PATTERN_QUERY, false, "no"),
+            Arguments.of(PATTERN_QUERY, true, "yes"),
+            Arguments.of(PATTERN_SWITCH, null, null),
+            Arguments.of(PATTERN_SWITCH, false, "off"),
+            Arguments.of(PATTERN_SWITCH, true, "on")
+        );
     }
 
-    @Test(expected = ParseException.class)
-    @Parameters(method = "where_parse_error")
+    @ParameterizedTest
+    @MethodSource("where_parse_error")
     public void parseErrorWithPatternAndLiteral(String pattern, String literal) {
         // given:
         BooleanFormatter formatter = BooleanFormatter.getInstance(pattern);
 
         // when:
-        formatter.parse(literal);
+        assertThrows(ParseException.class, () -> formatter.parse(literal));
     }
 
-    protected Object[] where_parse_error() {
-        return new Object[]{
-            new Object[]{PATTERN_BOOL, "abc"},
-            new Object[]{PATTERN_QUERY, "abc"},
-            new Object[]{PATTERN_SWITCH, "abc"}
-        };
+    public static Stream<Arguments> where_parse_error() {
+        return Stream.of(
+            Arguments.of(PATTERN_BOOL, "abc"),
+            Arguments.of(PATTERN_QUERY, "abc"),
+            Arguments.of(PATTERN_SWITCH, "abc")
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters(method = "where_invalid_pattern")
+    @ParameterizedTest
+    @MethodSource("where_invalid_pattern")
     public void createFormatterWithInvalidPattern(String pattern) {
         // expect:
-        BooleanFormatter.getInstance(pattern);
+        assertThrows(IllegalArgumentException.class, () -> BooleanFormatter.getInstance(pattern));
     }
 
-    protected Object[] where_invalid_pattern() {
-        return new Object[]{
-            new Object[]{";garbage*@%&"},
-        };
+    public static Stream<Arguments> where_invalid_pattern() {
+        return Stream.of(
+            Arguments.of(";garbage*@%&")
+        );
     }
 
-    @Test(expected = ParseException.class)
-    @Parameters(method = "where_invalid_literal")
+    @ParameterizedTest
+    @MethodSource("where_invalid_literal")
     public void parseInvalidLiteral(String literal) {
         // expect:
-        BooleanFormatter.parseBoolean(literal);
+        assertThrows(ParseException.class, () -> BooleanFormatter.parseBoolean(literal));
     }
 
-    protected Object[] where_invalid_literal() {
-        return new Object[]{
-            new Object[]{";garbage*@%&"},
-        };
+    public static Stream<Arguments> where_invalid_literal() {
+        return Stream.of(
+            Arguments.of(";garbage*@%&")
+        );
     }
 }

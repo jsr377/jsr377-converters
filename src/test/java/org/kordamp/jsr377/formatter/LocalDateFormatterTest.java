@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,24 @@
  */
 package org.kordamp.jsr377.formatter;
 
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.kordamp.jsr377.ConversionSupport;
 
 import java.time.LocalDate;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andres Almiray
  */
 public class LocalDateFormatterTest extends ConversionSupport {
-    @Test
-    @Parameters(method = "where_value_literal")
+    @ParameterizedTest
+    @MethodSource("where_value_literal")
     public void valueProducesLiteral(LocalDate value, String literal) {
         // given:
         LocalDateFormatter formatter = new LocalDateFormatter();
@@ -43,14 +46,14 @@ public class LocalDateFormatterTest extends ConversionSupport {
         assertThat(result, equalTo(value));
     }
 
-    protected Object[] where_value_literal() {
-        return new Object[]{
-            new Object[]{LocalDate.of(1970, 1, 1), "1970-01-01"}
-        };
+    public static Stream<Arguments> where_value_literal() {
+        return Stream.of(
+            Arguments.of(LocalDate.of(1970, 1, 1), "1970-01-01")
+        );
     }
 
-    @Test
-    @Parameters(method = "where_pattern_value_literal")
+    @ParameterizedTest
+    @MethodSource("where_pattern_value_literal")
     public void valueWithPatternProducesLiteral(String pattern, LocalDate value, String literal) {
         // given:
         LocalDateFormatter formatter = new LocalDateFormatter(pattern);
@@ -64,39 +67,39 @@ public class LocalDateFormatterTest extends ConversionSupport {
         assertThat(result, equalTo(value));
     }
 
-    protected Object[] where_pattern_value_literal() {
-        return new Object[]{
-            new Object[]{"yyyy-MM-dd", null, null},
-            new Object[]{"yyyy-MM-dd", LocalDate.of(1970, 1, 1), "1970-01-01"}
-        };
+    public static Stream<Arguments> where_pattern_value_literal() {
+        return Stream.of(
+            Arguments.of("yyyy-MM-dd", null, null),
+            Arguments.of("yyyy-MM-dd", LocalDate.of(1970, 1, 1), "1970-01-01")
+        );
     }
 
-    @Test(expected = ParseException.class)
-    @Parameters(method = "where_parse_error")
+    @ParameterizedTest
+    @MethodSource("where_parse_error")
     public void parseErrorWithPatternAndLiteral(String pattern, String literal) {
         // given:
         LocalDateFormatter formatter = new LocalDateFormatter(pattern);
 
         // when:
-        formatter.parse(literal);
+        assertThrows(ParseException.class, () -> formatter.parse(literal));
     }
 
-    protected Object[] where_parse_error() {
-        return new Object[]{
-            new Object[]{"yyyy-MM-dd", "abc"}
-        };
+    public static Stream<Arguments> where_parse_error() {
+        return Stream.of(
+            Arguments.of("yyyy-MM-dd", "abc")
+        );
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters(method = "where_invalid_pattern")
+    @ParameterizedTest
+    @MethodSource("where_invalid_pattern")
     public void createFormatterWithInvalidPattern(String pattern) {
         // expect:
-        new LocalDateFormatter(pattern);
+        assertThrows(IllegalArgumentException.class, () -> new LocalDateFormatter(pattern));
     }
 
-    protected Object[] where_invalid_pattern() {
-        return new Object[]{
-            new Object[]{";garbage*@%&"},
-        };
+    public static Stream<Arguments> where_invalid_pattern() {
+        return Stream.of(
+            Arguments.of(";garbage*@%&")
+        );
     }
 }

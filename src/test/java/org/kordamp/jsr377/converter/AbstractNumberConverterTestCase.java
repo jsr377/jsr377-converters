@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
  */
 package org.kordamp.jsr377.converter;
 
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.kordamp.jsr377.ConversionSupport;
 
 import javax.application.converter.ConversionException;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andres Almiray
@@ -32,8 +33,8 @@ public abstract class AbstractNumberConverterTestCase<T extends Number> extends 
 
     protected abstract NumberConverter<T> createConverter(String format);
 
-    @Test
-    @Parameters(method = "where_value_format_result")
+    @ParameterizedTest
+    @MethodSource("where_value_format_result")
     public void nullsafe_valueWithFormatProducesResult(Object value, String format, T result) {
         // given:
         NumberConverter<T> converter = createConverter(format);
@@ -48,13 +49,13 @@ public abstract class AbstractNumberConverterTestCase<T extends Number> extends 
         assertThat(output, equalTo(result));
     }
 
-    @Test(expected = ConversionException.class)
-    @Parameters(method = "where_invalid_value")
+    @ParameterizedTest
+    @MethodSource("where_invalid_value")
     public void invalidValueProducesError(Object value) {
         // given:
         NumberConverter<T> converter = createConverter();
 
         // when:
-        converter.fromObject(value);
+        assertThrows(ConversionException.class, () -> converter.fromObject(value));
     }
 }

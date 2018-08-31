@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ buildscript {
         classpath 'org.ajoberstar:gradle-git:1.7.2'
         classpath 'net.nemerosa:versioning:2.7.1'
         classpath 'org.kordamp.gradle:stats-gradle-plugin:0.2.2'
+        classpath 'gradle.plugin.gradle-java9-collision:plugin:0.2.3'
     }
 }
 
@@ -37,6 +38,7 @@ apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'org.kordamp.gradle.stats'
 apply from: 'gradle/code-quality.gradle'
 apply from: 'gradle/code-coverage.gradle'
+apply plugin: 'org.jonnyzzz.java9c'
 
 idea {
     project {
@@ -52,8 +54,10 @@ repositories {
 dependencies {
     compile "javax.application:jsr377-api:$jsr377Version"
     compile "org.slf4j:slf4j-api:$slf4jVersion"
-    testCompile "junit:junit:$junitVersion"
-    testCompile "pl.pragmatists:JUnitParams:$junitParamsVersion"
+    testCompile "org.junit.jupiter:junit-jupiter-api:$junit5Version"
+    testCompile "org.junit.jupiter:junit-jupiter-params:$junit5Version"
+    testCompile "org.junit.jupiter:junit-jupiter-engine:$junit5Version"
+    testCompile "org.hamcrest:java-hamcrest:$hamcrestVersion"
     testRuntime "org.slf4j:slf4j-simple:$slf4jVersion"
 }
 
@@ -87,7 +91,7 @@ artifacts {
 }
 
 javadoc {
-    excludes = ['**/*.html', 'META-INF/**', '**/*.groovy']
+    excludes = ['**/*.html', 'META-INF/**']
 
     options.use         = true
     options.splitIndex  = true
@@ -98,6 +102,18 @@ javadoc {
     options.docTitle    = "$project.name $version"
     options.footer      = rootProject.javadocFooter
     options.links       = ['http://docs.oracle.com/javase/8/docs/api/']
+}
+
+test {
+    useJUnitPlatform()
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+
+    reports {
+        html.enabled = true
+    }
 }
 
 apply from: 'gradle/publishing.gradle'

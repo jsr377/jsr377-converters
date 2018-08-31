@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,9 @@
  */
 package org.kordamp.jsr377.converter;
 
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.kordamp.jsr377.ConversionSupport;
 
 import javax.application.converter.ConversionException;
@@ -24,9 +25,11 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andres Almiray
@@ -42,8 +45,8 @@ public class URIConverterTest extends ConversionSupport {
         }
     }
 
-    @Test
-    @Parameters(method = "where_value_result")
+    @ParameterizedTest
+    @MethodSource("where_value_result")
     public void valueProducesResult(Object value, URI result) {
         // given:
         URIConverter converter = new URIConverter();
@@ -55,33 +58,33 @@ public class URIConverterTest extends ConversionSupport {
         assertThat(output, equalTo(result));
     }
 
-    @Test(expected = ConversionException.class)
-    @Parameters(method = "where_invalid_value")
+    @ParameterizedTest
+    @MethodSource("where_invalid_value")
     public void invalidValueProducesError(Object value) {
         // given:
         URIConverter converter = new URIConverter();
 
         // when:
-        converter.fromObject(value);
+        assertThrows(ConversionException.class, () -> converter.fromObject(value));
     }
 
-    protected Object[] where_value_result() {
-        return new Object[]{
-            new Object[]{null, null},
-            new Object[]{"", null},
-            new Object[]{" ", null},
-            new Object[]{"http://localhost", DEFAULT_URI},
-            new Object[]{new File("/").getAbsoluteFile(), new File("/").getAbsoluteFile().toURI()},
-            new Object[]{DEFAULT_URI, DEFAULT_URI},
-        };
+    public static Stream<Arguments> where_value_result() {
+        return Stream.of(
+            Arguments.of(null, null),
+            Arguments.of("", null),
+            Arguments.of(" ", null),
+            Arguments.of("http://localhost", DEFAULT_URI),
+            Arguments.of(new File("/").getAbsoluteFile(), new File("/").getAbsoluteFile().toURI()),
+            Arguments.of(DEFAULT_URI, DEFAULT_URI)
+        );
     }
 
-    protected Object[] where_invalid_value() {
-        return new Object[]{
-            new Object[]{Collections.emptyList()},
-            new Object[]{Collections.emptyMap()},
-            new Object[]{new Object()},
-            new Object[]{"http://localhost/&?_<>"},
-        };
+    public static Stream<Arguments> where_invalid_value() {
+        return Stream.of(
+            Arguments.of(Collections.emptyList()),
+            Arguments.of(Collections.emptyMap()),
+            Arguments.of(new Object()),
+            Arguments.of("http://localhost/&?_<>")
+        );
     }
 }

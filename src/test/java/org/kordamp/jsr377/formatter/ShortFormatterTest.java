@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 package org.kordamp.jsr377.formatter;
+
+import org.junit.jupiter.params.provider.Arguments;
+
+import java.util.stream.Stream;
 
 import static org.kordamp.jsr377.formatter.AbstractNumberFormatter.PATTERN_CURRENCY;
 import static org.kordamp.jsr377.formatter.AbstractNumberFormatter.PATTERN_PERCENT;
@@ -32,33 +36,33 @@ public class ShortFormatterTest extends AbstractNumberFormatterTestCase<Short> {
         return new ShortFormatter(pattern);
     }
 
-    protected Object[] where_simple() {
-        return new Object[]{
-            new Object[]{(short) 100, "100"}
-        };
+    public static Stream<Arguments> where_simple() {
+        return Stream.of(
+            Arguments.of((short) 100, "100")
+        );
     }
 
-    protected Object[] where_pattern() {
-        return new Object[]{
-            new Object[]{PATTERN_PERCENT, null, null},
-            new Object[]{PATTERN_CURRENCY, (short) 100, "$100.00"},
-            new Object[]{PATTERN_PERCENT, (short) 1, "100%"},
-            new Object[]{null, (short) 100, "100"},
-            new Object[]{"", (short) 100, "100"},
-            new Object[]{"##.0", (short) 20, "20.0"}
-        };
+    public static Stream<Arguments> where_pattern() {
+        return Stream.of(
+            Arguments.of(PATTERN_PERCENT, null, null),
+            Arguments.of(PATTERN_CURRENCY, (short) 100, "$100.00"),
+            Arguments.of(PATTERN_PERCENT, (short) 1, "100%"),
+            Arguments.of(null, (short) 100, "100"),
+            Arguments.of("", (short) 100, "100"),
+            Arguments.of("##.0", (short) 20, "20.0")
+        );
     }
 
-    protected Object[] where_parse_error() {
-        return new Object[]{
-            new Object[]{PATTERN_CURRENCY, "abc"},
-            new Object[]{PATTERN_PERCENT, "abc"}
-        };
+    public static Stream<Arguments> where_parse_error() {
+        return Stream.of(
+            Arguments.of(PATTERN_CURRENCY, "abc"),
+            Arguments.of(PATTERN_PERCENT, "abc")
+        );
     }
 
-    protected Object[] where_invalid_pattern() {
-        return new Object[]{
-            new Object[]{";garbage*@%&"},
-        };
+    public static Stream<Arguments> where_invalid_pattern() {
+        return Stream.of(
+            Arguments.of(";garbage*@%&")
+        );
     }
 }

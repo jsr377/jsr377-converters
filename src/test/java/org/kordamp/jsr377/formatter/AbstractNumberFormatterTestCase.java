@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 the original author or authors.
+ * Copyright 2015-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  */
 package org.kordamp.jsr377.formatter;
 
-import junitparams.Parameters;
-import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.kordamp.jsr377.ConversionSupport;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Andres Almiray
@@ -30,8 +31,8 @@ public abstract class AbstractNumberFormatterTestCase<T extends Number> extends 
 
     protected abstract Formatter<T> createFormatter(String pattern);
 
-    @Test
-    @Parameters(method = "where_simple")
+    @ParameterizedTest
+    @MethodSource("where_simple")
     public void valueProducesLiteral(T value, String literal) {
         // given:
         Formatter<T> formatter = createFormatter();
@@ -45,8 +46,8 @@ public abstract class AbstractNumberFormatterTestCase<T extends Number> extends 
         assertThat(result, equalTo(value));
     }
 
-    @Test
-    @Parameters(method = "where_pattern")
+    @ParameterizedTest
+    @MethodSource("where_pattern")
     public void valueWithPatternProducesLiteral(String pattern, T value, String literal) {
         // given:
         Formatter<T> formatter = createFormatter(pattern);
@@ -60,20 +61,20 @@ public abstract class AbstractNumberFormatterTestCase<T extends Number> extends 
         assertThat(result, equalTo(value));
     }
 
-    @Test(expected = ParseException.class)
-    @Parameters(method = "where_parse_error")
+    @ParameterizedTest
+    @MethodSource("where_parse_error")
     public void parseErrorWithPatternAndLiteral(String pattern, String literal) {
         // given:
         Formatter<T> formatter = createFormatter(pattern);
 
         // when:
-        formatter.parse(literal);
+        assertThrows(ParseException.class, () -> formatter.parse(literal));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    @Parameters(method = "where_invalid_pattern")
+    @ParameterizedTest
+    @MethodSource("where_invalid_pattern")
     public void createFormatterWithInvalidPattern(String pattern) {
         // expect:
-        createFormatter(pattern);
+        assertThrows(IllegalArgumentException.class, () -> createFormatter(pattern));
     }
 }
