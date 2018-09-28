@@ -15,8 +15,8 @@
  */
 package org.kordamp.jsr377;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -29,27 +29,28 @@ import java.util.TimeZone;
  * @author Andres Almiray
  */
 public abstract class ConversionSupport {
-    private Locale defaultLocale = Locale.getDefault();
+    private static Locale defaultLocale = Locale.getDefault();
+    private static TimeZone defaultTimeZone = TimeZone.getDefault();
 
-    @BeforeEach
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
         Locale.setDefault(Locale.US);
+        TimeZone.setDefault(TimeZone.getTimeZone("Etc/GMT"));
     }
 
-    @AfterEach
-    public void cleanup() {
+    @AfterAll
+    public static void cleanup() {
         Locale.setDefault(defaultLocale);
+        TimeZone.setDefault(defaultTimeZone);
     }
 
     public static Date epochAsDate() {
         // Thu Jan 01 00:00:00 1970
-        TimeZone.setDefault(TimeZone.getTimeZone("Etc/GMT"));
         return clearTime(new Date(0));
     }
 
     public static Calendar epochAsCalendar() {
         // Thu Jan 01 00:00:00 1970
-        TimeZone.setDefault(TimeZone.getTimeZone("Etc/GMT"));
         Calendar c = Calendar.getInstance();
         c.setTime(epochAsDate());
         return c;
