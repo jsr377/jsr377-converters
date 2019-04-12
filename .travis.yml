@@ -9,10 +9,10 @@ cache:
   - $HOME/.gradle/wrapper/
   - $HOME/.sonar/cache/
 before_script:
-  - ./gradlew --no-daemon --version
+  - ./gradlew --version
   - cd ../..
   - git clone --depth=50 --branch=master https://github.com/jsr377/jsr377-api.git jsr377/jsr377-api
   - cd jsr377/jsr377-converters
-script: ./gradlew --console=plain --no-daemon clean build jacocoTestReport -PbintrayUsername=undefined -PbintrayApiKey=undefined
+script: ./gradlew --console=plain clean build jacocoTestReport --scan
 env: TERM=dumb
-after_success: ./gradlew --console=plain --no-daemon coveralls
+after_success: ./gradlew --console=plain coveralls
