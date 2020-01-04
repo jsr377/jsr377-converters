@@ -13,6 +13,6 @@ before_script:
   - cd ../..
   - git clone --depth=50 --branch=master https://github.com/jsr377/jsr377-api.git jsr377/jsr377-api
   - cd jsr377/jsr377-converters
-script: ./gradlew clean build jacocoTestReport -S
+script: ./gradlew clean build aggregateJacocoReport -S
 env: TERM=dumb
 after_success: ./gradlew coveralls
