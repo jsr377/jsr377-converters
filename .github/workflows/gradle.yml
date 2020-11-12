@@ -58,3 +58,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -S
         working-directory: ./main
+      - name: Coverage reports
+        run: ./gradlew aggregateJacocoReport coveralls -S
+        working-directory: ./main
