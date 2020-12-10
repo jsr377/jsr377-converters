@@ -26,6 +26,7 @@ pluginManagement {
         id 'org.kordamp.gradle.bintray'      version kordampPluginVersion
         id 'org.kordamp.gradle.coveralls'    version kordampPluginVersion
         id 'org.jonnyzzz.java9c'             version '0.2.3'
+        id 'org.beryx.jar'                   version '1.2.0'
     }
 }
 

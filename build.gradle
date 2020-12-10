@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 plugins {
-    id 'java-library'
     id 'idea'
+    id 'java-library'
+    id 'org.beryx.jar'
     id 'org.kordamp.gradle.java-project'
     id 'org.kordamp.gradle.bintray'
     id 'org.kordamp.gradle.coveralls'
@@ -126,9 +127,5 @@ test {
 }
 
 jar {
-    manifest {
-        attributes(
-            'Automatic-Module-Name': 'org.kordamp.jsr377.converters'
-        )
-    }
+    moduleInfoPath = 'src/main/module/module-info.java'
 }
